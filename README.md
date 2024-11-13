@@ -22,3 +22,6 @@ pip install -r requirements.txt
 streamlit run main.py
 ```
 
+## Example Screenshot
+
+![Example](example.png)
