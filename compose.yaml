@@ -1,0 +1,15 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      ssh:
+        - default
+    restart: always
+    volumes:
+      - logs:/app/logs
+    ports:
+      - "8000:8000"
+
+volumes:
+  logs:
