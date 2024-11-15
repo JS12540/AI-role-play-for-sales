@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_mic_recorder import speech_to_text
-from streamlit_TTS import auto_play, text_to_audio
+from gtts import gTTS
+import tempfile
 from groq import Groq
 import openai
 import json
@@ -96,6 +97,21 @@ def parse_query_from_response(response_text):
         st.error("Error decoding JSON response.")
         return None
 
+def text_to_speech_gtts(text, language="en"):
+    try:
+        # Create TTS object
+        tts = gTTS(text=text, lang=language)
+        
+        # Save to temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
+            tts.save(f.name)
+            audio_path = f.name
+        
+        # Display audio in Streamlit
+        st.audio(audio_path, format="audio/mp3")
+    except Exception as e:
+        st.error(f"Error with TTS: {e}")
+
 # Step 1: Record and transcribe audio in the selected language
 st.write("### Record and Transcribe Salesperson's Speech:")
 recorded_text = speech_to_text(
@@ -133,9 +149,8 @@ if recorded_text:
             st.write("**Parent (AI):**", parsed_query)
             chat_history.append({"role": "assistant", "content": parsed_query})
 
-            # Convert the parsed query to speech in the selected language and play
-            response_audio = text_to_audio(parsed_query, language=selected_language_code)
-            auto_play(response_audio)
+            # Convert the parsed query to speech using gTTS and display in Streamlit
+            text_to_speech_gtts(parsed_query, language=selected_language_code)
 
 # Show Chat History Button
 if st.sidebar.button("Show Chat History"):
